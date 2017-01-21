@@ -1,0 +1,5 @@
+*.pgp
+*.proof
+*.sig
+*.txt
+fugl-*

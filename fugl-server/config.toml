@@ -1,0 +1,14 @@
+on_failure = "SOME COMMAND"
+
+[canary]
+store = ".canaries"
+key_file = "public.pgp"
+
+[logging]
+file = "log.txt"
+level = "debug"
+
+[server]
+port = 8080
+timeout_read = 10
+timeout_write = 10
