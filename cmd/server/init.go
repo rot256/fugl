@@ -14,5 +14,4 @@ func init() {
 	log.SetOutput(logWriter{os.Stdout})
 	initConfig()
 	initLogging()
-	initCanary()
 }
