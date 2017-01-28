@@ -74,7 +74,7 @@ func (h *SubmitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// parse and verify signature
 	proof := r.PostFormValue("proof")
 	logInfo("New proof submission:", proof)
-	canary, err := fugl.VerifyProof(h.state.canaryKey, proof)
+	canary, err := fugl.OpenProof(h.state.canaryKey, proof)
 	if err != nil {
 		SendRequestError(w, err.Error())
 	}

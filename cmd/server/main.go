@@ -40,7 +40,7 @@ func createState() *ServerState {
 
 	// parse latest proof
 	if state.latestProof != "" {
-		state.latestCanary, err = fugl.VerifyProof(state.canaryKey, state.latestProof)
+		state.latestCanary, err = fugl.OpenProof(state.canaryKey, state.latestProof)
 		if err != nil {
 			logFatal("Failed to load latest canary:", err.Error())
 		}

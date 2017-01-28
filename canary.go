@@ -15,6 +15,7 @@ import (
 const (
 	CanaryVersion      = 0
 	CanaryTimeFormat   = "2006-01-02"
+	CanaryNonceSize    = 32
 	ProofFileExtension = ".sig"
 	ProofFileName      = "proof-%s-%s" + ProofFileExtension
 )

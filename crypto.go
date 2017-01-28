@@ -2,15 +2,16 @@ package fugl
 
 import (
 	"bytes"
+	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"golang.org/x/crypto/openpgp"
 	"golang.org/x/crypto/openpgp/armor"
-	"golang.org/x/crypto/openpgp/clearsign"
 	"golang.org/x/crypto/openpgp/packet"
 )
+
+var RAND_ALPHABET = []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_")
 
 func HashString(input string) string {
 	hash := sha256.Sum256([]byte(input))
@@ -27,27 +28,19 @@ func LoadPublicKey(key string) (*openpgp.Entity, error) {
 	return openpgp.ReadEntity(packet.NewReader(block.Body))
 }
 
-func VerifyProof(publicKey *openpgp.Entity, proof string) (*Canary, error) {
-	// parse clear signature
-	block, rest := clearsign.Decode([]byte(proof))
-	if len(rest) > 0 {
-		return nil, errors.New("Proof contains junk")
+func GetRandBytes(n int) []byte {
+	b := make([]byte, n)
+	i, err := rand.Read(b)
+	if i != n || err != nil {
+		panic(err)
 	}
+	return b
+}
 
-	// verify signature
-	keyring := make(openpgp.EntityList, 1)
-	keyring[0] = publicKey
-	content := bytes.NewReader(block.Bytes)
-	_, err := openpgp.CheckDetachedSignature(keyring, content, block.ArmoredSignature.Body)
-	if err != nil {
-		return nil, errors.New("Invalid signature")
+func GetRandStr(n int) string {
+	str := make([]rune, n)
+	for i, v := range GetRandBytes(n) {
+		str[i] = RAND_ALPHABET[int(v)%len(RAND_ALPHABET)]
 	}
-
-	// load inner JSON structure
-	var canary Canary
-	err = json.Unmarshal(block.Bytes, &canary)
-	if err != nil {
-		return nil, errors.New("Unable to parse inner canary structure")
-	}
-	return &canary, nil
+	return string(str)
 }
