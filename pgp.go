@@ -7,6 +7,7 @@ import (
 	"golang.org/x/crypto/openpgp"
 	"golang.org/x/crypto/openpgp/armor"
 	"golang.org/x/crypto/openpgp/clearsign"
+	"golang.org/x/crypto/openpgp/packet"
 )
 
 /* Helper function for OpenPGP */
@@ -34,6 +35,26 @@ func SealProof(entity *openpgp.Entity, canary Canary) (string, error) {
 		return "", err
 	}
 	return PGPSign(entity, inner)
+}
+
+func PGPLoadPrivateKey(key []byte) (*openpgp.Entity, error) {
+	block, err := armor.Decode(bytes.NewReader([]byte(key)))
+	if err != nil {
+		return nil, err
+	} else if block.Type != openpgp.PrivateKeyType {
+		return nil, errors.New("Not a OpenPGP public key")
+	}
+	return openpgp.ReadEntity(packet.NewReader(block.Body))
+}
+
+func PGPLoadPublicKey(key []byte) (*openpgp.Entity, error) {
+	block, err := armor.Decode(bytes.NewReader([]byte(key)))
+	if err != nil {
+		return nil, err
+	} else if block.Type != openpgp.PublicKeyType {
+		return nil, errors.New("Not a OpenPGP private key")
+	}
+	return openpgp.ReadEntity(packet.NewReader(block.Body))
 }
 
 func PGPSign(entity *openpgp.Entity, message []byte) (string, error) {

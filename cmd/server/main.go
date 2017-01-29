@@ -23,7 +23,7 @@ func createState() *ServerState {
 		logFatal("Unable to load public key from:", config.Canary.KeyFile)
 	}
 	state.canaryKeyArmor = string(key)
-	state.canaryKey, err = fugl.LoadPublicKey(state.canaryKeyArmor)
+	state.canaryKey, err = fugl.PGPLoadPublicKey(key)
 	if err != nil {
 		logFatal("Unable to parse PGP key:", err)
 	}
