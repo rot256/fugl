@@ -133,6 +133,10 @@ func main() {
 	switch flags.Operation {
 	case "create":
 		operationCreate(flags)
+	case "add":
+		operationAdd(flags)
+	case "push":
+		operationPush(flags)
 	default:
 		fmt.Fprintf(os.Stderr, "Invalid operation: %s\n", flags.Operation)
 		os.Exit(EXIT_INVALID_OPERATION)

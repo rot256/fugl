@@ -92,6 +92,12 @@ func (h *SubmitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// verify deadline after previous deadline
+	if !h.state.latestCanary.Deadline.Time().After(canary.Deadline.Time()) {
+		SendRequestError(w, "New canary deadline must be after previous deadline")
+		return
+	}
+
 	// protential race condition
 	h.mutex.Lock()
 	defer h.mutex.Unlock()

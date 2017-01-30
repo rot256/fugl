@@ -19,6 +19,7 @@ type Flags struct {
 	Address    string        // address of submission point
 	Operation  string        // operation to apply
 	Debug      bool          // used during development
+	Json       bool          // enable json output
 	Help       bool          // print help
 }
 
@@ -35,6 +36,7 @@ const (
 	FlagNameDebug      = "debug"
 	FlagNameHelp       = "help"
 	FlagNameExpire     = "expire"
+	FlagNameJson       = "json"
 )
 
 func init() {
@@ -56,6 +58,7 @@ func parseFlags() Flags {
 	flag.StringVar(&flags.Proxy, FlagNameProxy, "", "http/socks proxy")
 	flag.StringVar(&flags.Address, FlagNameAddress, "", "address of submission point")
 	flag.StringVar(&flags.Operation, FlagNameOperation, "", "operation, supported: pull, push, verify")
+	flag.BoolVar(&flags.Json, FlagNameJson, false, "enable json output (stdout only)")
 	flag.BoolVar(&flags.Debug, FlagNameDebug, false, "enable debugging")
 	flag.BoolVar(&flags.Help, FlagNameHelp, false, "print help")
 	flag.DurationVar(&flags.Expire, FlagNameExpire, 0, "expiration delta")
@@ -65,7 +68,11 @@ func parseFlags() Flags {
 	}
 	if flags.Help {
 		printHelp()
-		os.Exit(0)
+		os.Exit(EXIT_SUCCESS)
+	}
+	if flags.Json {
+		fmt.Fprintf(os.Stderr, "JSON output not yet supported")
+		os.Exit(EXIT_INVALID_ARGUMENTS)
 	}
 	return flags
 }
