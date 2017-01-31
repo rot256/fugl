@@ -52,9 +52,9 @@ func createState() *ServerState {
 func buildHandler() http.Handler {
 	state := createState()
 	handler := http.NewServeMux()
-	handler.Handle("/submit", &SubmitHandler{state: state})
-	handler.Handle("/latest", &LatestHandler{state: state})
-	handler.Handle("/status", &StatusHandler{state: state})
+	handler.Handle(fugl.SERVER_SUBMIT_PATH, &SubmitHandler{state: state})
+	handler.Handle(fugl.SERVER_LATEST_PATH, &LatestHandler{state: state})
+	handler.Handle(fugl.SERVER_STATUS_PATH, &StatusHandler{state: state})
 	return handler
 }
 

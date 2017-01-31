@@ -72,7 +72,7 @@ type SubmitHandler struct {
 
 func (h *SubmitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// parse and verify signature
-	proof := r.PostFormValue("proof")
+	proof := r.PostFormValue(fugl.SERVER_SUBMIT_FIELD_NAME)
 	logInfo("New proof submission:", proof)
 	canary, err := fugl.OpenProof(h.state.canaryKey, proof)
 	if err != nil {
@@ -93,9 +93,11 @@ func (h *SubmitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// verify deadline after previous deadline
-	if !h.state.latestCanary.Deadline.Time().After(canary.Deadline.Time()) {
-		SendRequestError(w, "New canary deadline must be after previous deadline")
-		return
+	if h.state.latestCanary != nil {
+		if !h.state.latestCanary.Deadline.Time().After(canary.Deadline.Time()) {
+			SendRequestError(w, "New canary deadline must be after previous deadline")
+			return
+		}
 	}
 
 	// protential race condition

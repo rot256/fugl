@@ -3,9 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/fatih/color"
 	"os"
 	"time"
 )
+
+const tagFlags = "flag"
 
 type Flags struct {
 	Store      string        // directory for storing canaries (when validating)
@@ -43,8 +46,53 @@ func init() {
 	flag.Usage = printHelp
 }
 
+type FlagOpt struct {
+	required map[string]bool
+	optional map[string]bool
+}
+
+func (opt *FlagOpt) Required(name string, isEnabled bool) {
+	if opt.required == nil {
+		opt.required = make(map[string]bool)
+	}
+	opt.required[name] = isEnabled
+}
+
+func (opt *FlagOpt) Optional(name string, isEnabled bool) {
+	if opt.optional == nil {
+		opt.optional = make(map[string]bool)
+	}
+	opt.optional[name] = isEnabled
+}
+
+func (opt FlagOpt) Check() {
+	okay := true
+	for name := range opt.required {
+		okay = okay && opt.required[name]
+	}
+	if !okay {
+		for name := range opt.required {
+			line := fmt.Sprintf("required argument: '%s'\n", name)
+			if !opt.required[name] {
+				color.Red(line)
+			}
+		}
+		for name := range opt.optional {
+			line := fmt.Sprintf("optional argument: '%s'\n", name)
+			if !opt.optional[name] {
+				color.Blue(line)
+			}
+		}
+		os.Exit(EXIT_INVALID_ARGUMENTS)
+	}
+}
+
 func requiredArgument(name string) string {
 	return fmt.Sprintf("requires argument: '%s'\n", name)
+}
+
+func optionalArgument(name string) string {
+	return fmt.Sprintf("optional argument: '%s'\n", name)
 }
 
 func parseFlags() Flags {
@@ -55,7 +103,7 @@ func parseFlags() Flags {
 	flag.StringVar(&flags.PrivateKey, FlagNamePrivateKey, "", "path to a PGP private key")
 	flag.StringVar(&flags.PublicKey, FlagNamePublicKey, "", "path to a PGP public key")
 	flag.StringVar(&flags.Message, FlagNameMessage, "", "path to a custom notification")
-	flag.StringVar(&flags.Proxy, FlagNameProxy, "", "http/socks proxy")
+	flag.StringVar(&flags.Proxy, FlagNameProxy, "", "socks5 proxy")
 	flag.StringVar(&flags.Address, FlagNameAddress, "", "address of submission point")
 	flag.StringVar(&flags.Operation, FlagNameOperation, "", "operation, supported: pull, push, verify")
 	flag.BoolVar(&flags.Json, FlagNameJson, false, "enable json output (stdout only)")

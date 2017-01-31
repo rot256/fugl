@@ -129,7 +129,6 @@ func OperationCheck() {
 
 func main() {
 	flags := parseFlags()
-	fmt.Println(flags)
 	switch flags.Operation {
 	case "create":
 		operationCreate(flags)
