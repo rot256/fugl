@@ -12,6 +12,4 @@ func init() {
 	flag.Parse()
 	log.SetFlags(0)
 	log.SetOutput(logWriter{os.Stdout})
-	initConfig()
-	initLogging()
 }

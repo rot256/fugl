@@ -13,11 +13,12 @@ import (
  */
 
 const (
-	CanaryVersion      = 0
-	CanaryTimeFormat   = "2006-01-02"
-	CanaryNonceSize    = 32
-	ProofFileExtension = ".sig"
-	ProofFileName      = "proof-%s-%s" + ProofFileExtension
+	CanaryVersion       = 0
+	CanaryTimeFormat    = time.RFC3339
+	ProofFileTimeFormat = "20060102150405" // must be a valid filename and sortable
+	CanaryNonceSize     = 32
+	ProofFileExtension  = ".sig"
+	ProofFileName       = "proof-%s-%s" + ProofFileExtension
 )
 
 func LoadLatestProof(dir string) (string, error) {
@@ -45,7 +46,7 @@ func LoadLatestProof(dir string) (string, error) {
 
 func SaveToDirectory(proof string, dir string, when time.Time) error {
 	hash := HashString(proof)
-	date := time.Time(when).Format(CanaryTimeFormat)
+	date := time.Time(when).Format(ProofFileTimeFormat)
 	fileName := fmt.Sprintf(ProofFileName, date, hash)
 	filePath := path.Join(dir, fileName)
 	return ioutil.WriteFile(filePath, []byte(proof), 0600)

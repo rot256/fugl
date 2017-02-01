@@ -29,7 +29,7 @@ var (
 	LogEnableError   bool
 )
 
-func initLogging() {
+func initLogging(config Config) {
 	// Expand logging level
 	switch config.Logging.Level {
 	case "debug":

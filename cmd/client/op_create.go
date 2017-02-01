@@ -12,23 +12,13 @@ import (
 )
 
 func requiredFlagsCreate(flags Flags) {
-	var msg string
-	if flags.PrivateKey == "" {
-		msg += requiredArgument(FlagNamePrivateKey)
-	}
-	if flags.Output == "" {
-		msg += requiredArgument(FlagNameOutput)
-	}
-	if flags.Store == "" {
-		msg += requiredArgument(FlagNameStore)
-	}
-	if flags.Expire == time.Duration(0) {
-		msg += requiredArgument(FlagNameExpire)
-	}
-	if msg != "" {
-		fmt.Fprintf(os.Stderr, "%s", msg)
-		os.Exit(EXIT_INVALID_ARGUMENTS)
-	}
+	var opt FlagOpt
+	opt.Required(FlagNamePrivateKey, flags.PrivateKey != "")
+	opt.Required(FlagNameOutput, flags.Output != "")
+	opt.Required(FlagNameStore, flags.Store != "")
+	opt.Required(FlagNameExpire, flags.Expire != time.Duration(0))
+	opt.Optional(FlagNameMessage, flags.Message != "")
+	opt.Check()
 }
 
 func operationCreate(flags Flags) {

@@ -3,12 +3,16 @@ on_failure = "SOME COMMAND"
 [canary]
 store = ".canaries"
 key_file = "public.pgp"
+on_failure = "ls -lha"
 
 [logging]
 file = "log.txt"
-level = "debug"
+level = "info"
 
 [server]
 port = 8080
 timeout_read = 10
 timeout_write = 10
+enable_submit = true
+enable_latest = true
+enable_getkey = true

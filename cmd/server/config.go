@@ -11,12 +11,16 @@ type ConfigLogging struct {
 }
 
 type ConfigServer struct {
-	Port         uint16
-	Address      string
-	TimeoutRead  time.Duration
-	TimeoutWrite time.Duration
-	CertFile     string `toml:"cert_file"` // tls: certificate
-	KeyFile      string `toml:"key_file"`  // tls: private key
+	Port             uint16
+	Address          string
+	TimeoutRead      time.Duration
+	TimeoutWrite     time.Duration
+	CertFile         string `toml:"cert_file"`     // tls: certificate
+	KeyFile          string `toml:"key_file"`      // tls: private key
+	EnableViewSubmit bool   `toml:"enable_submit"` // enable submit view
+	EnableViewStatus bool   `toml:"enable_status"` // enable status view
+	EnableViewLatest bool   `toml:"enable_latest"` // enable latest view
+	EnableViewGetKey bool   `toml:"enable_getkey"` // enable get key view
 }
 
 type ConfigCanary struct {
@@ -31,11 +35,8 @@ type Config struct {
 	Canary  ConfigCanary  `toml:"canary"`  // canary settings
 }
 
-var config Config
-
-func initConfig() {
+func loadConfig() (Config, error) {
+	var config Config
 	_, err := toml.DecodeFile(*FlagConfigPath, &config)
-	if err != nil {
-		logFatal("Unable to open config:", *FlagConfigPath)
-	}
+	return config, err
 }

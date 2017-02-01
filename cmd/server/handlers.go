@@ -15,12 +15,28 @@ type ServerState struct {
 	latestProof    string          // newest proof
 	canaryKey      *openpgp.Entity // parsed public key
 	canaryKeyArmor string          // ascii armored pgp key
+	canaryLock     sync.RWMutex
 }
 
 func SendRequestError(w http.ResponseWriter, msg string) {
 	w.WriteHeader(http.StatusBadRequest)
 	w.Write([]byte(msg))
 	return
+}
+
+/* Serves the public key */
+
+type GetKeyHandler struct {
+	state *ServerState
+}
+
+func (h *GetKeyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if h.state.canaryKeyArmor == "" {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+	w.Header().Set("Content-Type", "text/plain")
+	w.Write([]byte(h.state.canaryKeyArmor))
 }
 
 /* Returns canary status on this node */
@@ -30,6 +46,9 @@ type StatusHandler struct {
 }
 
 func (h *StatusHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	h.state.canaryLock.RLock()
+	defer h.state.canaryLock.RUnlock()
+
 	// Generate info struct
 	var status fugl.CanaryStatus
 	status.Version = fugl.CanaryVersion
@@ -55,6 +74,8 @@ type LatestHandler struct {
 }
 
 func (h *LatestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	h.state.canaryLock.RLock()
+	defer h.state.canaryLock.RUnlock()
 	if h.state.latestProof == "" {
 		w.WriteHeader(http.StatusNoContent)
 		return
@@ -67,13 +88,12 @@ func (h *LatestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 type SubmitHandler struct {
 	state *ServerState
-	mutex sync.Mutex
 }
 
 func (h *SubmitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// parse and verify signature
 	proof := r.PostFormValue(fugl.SERVER_SUBMIT_FIELD_NAME)
-	logInfo("New proof submission:", proof)
+	logDebug("New proof submission:\n", proof)
 	canary, err := fugl.OpenProof(h.state.canaryKey, proof)
 	if err != nil {
 		SendRequestError(w, err.Error())
@@ -92,17 +112,17 @@ func (h *SubmitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// take write lock
+	h.state.canaryLock.Lock()
+	defer h.state.canaryLock.Unlock()
+
 	// verify deadline after previous deadline
 	if h.state.latestCanary != nil {
-		if !h.state.latestCanary.Deadline.Time().After(canary.Deadline.Time()) {
+		if !canary.Deadline.Time().After(h.state.latestCanary.Deadline.Time()) {
 			SendRequestError(w, "New canary deadline must be after previous deadline")
 			return
 		}
 	}
-
-	// protential race condition
-	h.mutex.Lock()
-	defer h.mutex.Unlock()
 
 	// verify previous canary hash
 	if h.state.latestProof != "" {
