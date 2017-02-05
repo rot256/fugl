@@ -14,7 +14,8 @@ Furthermore you should create a directory for storing the proof chain (default i
 
 You can create new proofs using the create operation,
 the `previous` field will be populated using the newest proof in the store (unless the store is empty).
-Here an example of creating a proof, with an expiry date 100 days (2400 hours) into the future.
+
+Here an example of creating a proof, with an expiry date 100 days (2400 hours) into the future:
 
 ```
 ~> ./client --operation=create --private-key=./private.pgp --expire=2400h
@@ -28,6 +29,7 @@ It is recommended that you add this to the local store
 When you have created (or pulled) a new proof you may want to add this to the store,
 which is the directory storing the state of the proof chain.
 This is used both when following chains from other people and after creating a new proof.
+
 An example of using the "add" operation:
 
 ```
@@ -42,7 +44,7 @@ Of course this also validates the signature and previous field.
 Proofs are added to the server by pushing.
 Pushing is really a fancy word for issuing a post request, after which the server will validate the proof (in completely the same way as the "add" operation).
 
-Here a silly example using a server on localhost:
+A silly example of using the "push" operation, using a server on localhost:
 
 ```
 ~> ./client --operation=push --address=http://127.0.0.1:8080/submit
@@ -54,6 +56,8 @@ Successfully pushed new proof to server
 This is essentially just a HTTP get request and can also be carried out using wget, curl or your favourite browser.
 The client "pulls" the newest proof from the server into a temporary file (output),
 which you can then validate and add to the store using "add" (see next section).
+
+A silly example of using the "pull" operation, using a server on localhost:
 
 ```
 ~> ./client --operation=pull --address=http://127.0.0.1:8080/latest
