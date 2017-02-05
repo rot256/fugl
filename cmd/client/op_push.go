@@ -53,4 +53,5 @@ func operationPush(flags Flags) {
 		fmt.Fprintf(os.Stderr, "Submission failed %s with: '%s'", resp.Status, string(msg))
 		os.Exit(EXIT_CONNECTION_FAILURE)
 	}
+	fmt.Println("Successfully pushed new proof to server")
 }
