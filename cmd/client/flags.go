@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/fatih/color"
+	"github.com/rot256/fugl"
 	"os"
 	"time"
 )
@@ -97,18 +98,17 @@ func optionalArgument(name string) string {
 
 func parseFlags() Flags {
 	var flags Flags
-	flag.StringVar(&flags.Input, FlagNameInput, "", "path to input file")
-	flag.StringVar(&flags.Output, FlagNameOutput, "", "path to output file")
-	flag.StringVar(&flags.Store, FlagNameStore, "", "path to store/state")
+	flag.StringVar(&flags.Input, FlagNameInput, "temp"+fugl.ProofFileExtension, "path to input file")
+	flag.StringVar(&flags.Output, FlagNameOutput, "temp"+fugl.ProofFileExtension, "path to output file")
+	flag.StringVar(&flags.Store, FlagNameStore, "./store", "path to database directory")
 	flag.StringVar(&flags.PrivateKey, FlagNamePrivateKey, "", "path to a PGP private key")
 	flag.StringVar(&flags.PublicKey, FlagNamePublicKey, "", "path to a PGP public key")
 	flag.StringVar(&flags.Message, FlagNameMessage, "", "path to a custom notification")
 	flag.StringVar(&flags.Proxy, FlagNameProxy, "", "socks5 proxy")
-	flag.StringVar(&flags.Address, FlagNameAddress, "", "address of submission point")
+	flag.StringVar(&flags.Address, FlagNameAddress, "", "address of canary server")
 	flag.StringVar(&flags.Operation, FlagNameOperation, "", "operation, supported: pull, push, verify")
-	flag.BoolVar(&flags.Json, FlagNameJson, false, "enable json output (stdout only)")
 	flag.BoolVar(&flags.Debug, FlagNameDebug, false, "enable debugging")
-	flag.BoolVar(&flags.Help, FlagNameHelp, false, "print help")
+	flag.BoolVar(&flags.Help, FlagNameHelp, false, "print this help page")
 	flag.DurationVar(&flags.Expire, FlagNameExpire, 0, "expiration delta")
 	flag.Parse()
 	if flags.Debug {
@@ -131,13 +131,15 @@ func printHelp() {
   This is a client for the fugl canary system.
   To use this client you must specify 1 of three operations:
 
-    push   : uploads a new canary to a remote http server
+    push   : uploads a new canary to a server
     pull   : downloads the latest canary from the remote
     verify : verifies a locally stored canary against the state of store
     create : creates a new canary locally
 
   You may specify any one of these to see what arguments they require.
-`
 
-	fmt.Println(msg)
+2. List of flags:
+`
+	fmt.Fprintf(os.Stderr, msg)
+	flag.PrintDefaults()
 }

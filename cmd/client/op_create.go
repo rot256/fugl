@@ -94,4 +94,5 @@ func operationCreate(flags Flags) {
 		os.Exit(EXIT_FILE_READ_ERROR)
 	}
 	fmt.Println("Wrote new proof to:", flags.Output)
+	fmt.Println("It is recommended that you add this to the local store")
 }

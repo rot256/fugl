@@ -17,7 +17,7 @@ const (
 	CanaryTimeFormat    = time.RFC3339
 	ProofFileTimeFormat = "20060102150405" // must be a valid filename and sortable
 	CanaryNonceSize     = 32
-	ProofFileExtension  = ".sig"
+	ProofFileExtension  = ".proof"
 	ProofFileName       = "proof-%s-%s" + ProofFileExtension
 )
 

@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/rot256/fugl"
-	"golang.org/x/net/proxy"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -22,16 +21,7 @@ func operationPush(flags Flags) {
 	requiredFlagsPush(flags)
 
 	// create (proxied) client
-	client, err := func(addr string) (*http.Client, error) {
-		if addr == "" {
-			return &http.Client{}, nil
-		}
-		dialer, err := proxy.SOCKS5("tcp", addr, nil, proxy.Direct)
-		httpTransport := &http.Transport{
-			Dial: dialer.Dial,
-		}
-		return &http.Client{Transport: httpTransport}, err
-	}(flags.Proxy)
+	client, err := CreateHttpClient(flags.Proxy)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed connect to proxy: %s", err.Error())
 		os.Exit(EXIT_BAD_PROXY)

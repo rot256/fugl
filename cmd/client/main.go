@@ -128,7 +128,10 @@ func OperationCheck() {
 */
 
 func main() {
+	// parse flags
 	flags := parseFlags()
+
+	// handle different operations
 	switch flags.Operation {
 	case "create":
 		operationCreate(flags)
@@ -136,9 +139,12 @@ func main() {
 		operationAdd(flags)
 	case "push":
 		operationPush(flags)
+	case "pull":
+		operationPull(flags)
+	case "":
+		printHelp()
 	default:
 		fmt.Fprintf(os.Stderr, "Invalid operation: %s\n", flags.Operation)
 		os.Exit(EXIT_INVALID_OPERATION)
 	}
-
 }
