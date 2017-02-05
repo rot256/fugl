@@ -1,12 +1,10 @@
-on_failure = "SOME COMMAND"
-
 [canary]
-store = ".canaries"
-key_file = "public.pgp"
-on_failure = "ls -lha"
+store = "./proofs"
+key_file = "./public.pgp"
+on_failure = ""
 
 [logging]
-file = "log.txt"
+file = "./log.txt"
 level = "info"
 
 [server]
