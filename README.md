@@ -1,13 +1,13 @@
 # Fugl
 
-Fugl (bird in Danish) is a [warrant canary](https://en.wikipedia.org/wiki/Warrant_canary) solution/system.
+Fugl ("bird" in Danish) is a [warrant canary](https://en.wikipedia.org/wiki/Warrant_canary) solution/system.
 The project attempts to mitigate problems with existing canary solutions:
 
 > We have seen canaries that are updated on a daily basis and canaries which are updated once per year.
 > We have seen canaries that were created once and then never updated again.
 > Again, the fact that canaries are non-standard makes it difficult to automatically monitor them for changes or takedowns.
 >
-> EFF (Canary Watch – One Year Later)
+> - EFF (Canary Watch – One Year Later)
 
 The goal is to provide canaries which are:
 
@@ -76,7 +76,10 @@ You can start using Fugl, by first setting up a go environment, then:
 ```
 
 And use the same procedure for the server.
+
 If there is interest I will provide pre-compiled binaries (but given the setting I would advise against it).
+
+Further documentation in the making.
 
 ## Contributing
 
@@ -86,6 +89,7 @@ if you want to contribute the best way to do so is by:
 - Read the code (it is very short and quite readable)
 - Provide suggestions for Canary format/API changes
 
-Simplicity is prioritises over new features!
+Simplicity is prioritised over new features!
+
 This repo WILL NOT contain an automatic system for tracking the canaries,
 such a system should be easy to implement using the client (and I encourage people to do so).
