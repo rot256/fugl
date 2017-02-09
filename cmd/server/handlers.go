@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"github.com/rot256/fugl"
 	"golang.org/x/crypto/openpgp"
 	"net/http"
@@ -39,34 +38,6 @@ func (h *GetKeyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(h.state.canaryKeyArmor))
 }
 
-/* Returns canary status on this node */
-
-type StatusHandler struct {
-	state *ServerState
-}
-
-func (h *StatusHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.state.canaryLock.RLock()
-	defer h.state.canaryLock.RUnlock()
-
-	// Generate info struct
-	var status fugl.CanaryStatus
-	status.Version = fugl.CanaryVersion
-	status.Key = h.state.canaryKeyArmor
-	status.Enabled = h.state.latestProof != ""
-
-	// Serialize
-	resp, err := json.MarshalIndent(status, "", "    ")
-	if err != nil {
-		logError("JSON error:", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "text/json")
-	w.WriteHeader(http.StatusFound)
-	w.Write(resp)
-}
-
 /* Serves the latest published canary */
 
 type LatestHandler struct {
@@ -94,7 +65,7 @@ func (h *SubmitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// parse and verify signature
 	proof := r.PostFormValue(fugl.SERVER_SUBMIT_FIELD_NAME)
 	logDebug("New proof submission:\n", proof)
-	canary, err := fugl.OpenProof(h.state.canaryKey, proof)
+	canary, _, err := fugl.OpenProof(h.state.canaryKey, proof)
 	if err != nil {
 		SendRequestError(w, err.Error())
 	}
@@ -116,19 +87,16 @@ func (h *SubmitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.state.canaryLock.Lock()
 	defer h.state.canaryLock.Unlock()
 
+	// verify general fields
+	err = fugl.CheckCanaryFormat(canary, time.Now())
+	if err != nil {
+		SendRequestError(w, err.Error())
+	}
+
 	// verify deadline after previous deadline
 	if h.state.latestCanary != nil {
 		if !canary.Deadline.Time().After(h.state.latestCanary.Deadline.Time()) {
 			SendRequestError(w, "New canary deadline must be after previous deadline")
-			return
-		}
-	}
-
-	// verify previous canary hash
-	if h.state.latestProof != "" {
-		hash := fugl.HashString(proof)
-		if hash != canary.Previous {
-			SendRequestError(w, "Canary must reference preceeding canary hash")
 			return
 		}
 	}

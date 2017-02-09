@@ -6,13 +6,12 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"os"
 )
 
 func requiredFlagsPush(flags Flags) {
 	var opt FlagOpt
 	opt.Required(FlagNameAddress, flags.Address != "")
-	opt.Required(FlagNameInput, flags.Input != "")
+	opt.Required(FlagNameProof, flags.Proof != "")
 	opt.Optional(FlagNameProxy, flags.Proxy != "")
 	opt.Check()
 }
@@ -23,15 +22,13 @@ func operationPush(flags Flags) {
 	// create (proxied) client
 	client, err := CreateHttpClient(flags.Proxy)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed connect to proxy: %s", err.Error())
-		os.Exit(EXIT_BAD_PROXY)
+		exitError(EXIT_BAD_PROXY, "Failed connect to proxy: %s", err.Error()) // very naughty proxy
 	}
 
 	// read input file
-	content, err := ioutil.ReadFile(flags.Input)
+	content, err := ioutil.ReadFile(flags.Proof)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to read input file: %s", err.Error())
-		os.Exit(EXIT_FILE_READ_ERROR)
+		exitError(EXIT_FILE_READ_ERROR, "Failed to read input file: %s", err.Error())
 	}
 
 	// post
@@ -39,19 +36,16 @@ func operationPush(flags Flags) {
 	form.Add(fugl.SERVER_SUBMIT_FIELD_NAME, string(content))
 	resp, err := client.PostForm(flags.Address, form)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to connect to remote server: %s", err.Error())
-		os.Exit(EXIT_CONNECTION_FAILURE)
+		exitError(EXIT_CONNECTION_FAILURE, "Failed to connect to remote server: %s", err.Error())
 	}
 
 	// check for server error message
 	if resp.StatusCode != http.StatusNoContent {
 		msg, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Submission failed: %s", resp.Status)
-			os.Exit(EXIT_CONNECTION_FAILURE)
+			exitError(EXIT_CONNECTION_FAILURE, "Submission failed: %s", resp.Status)
 		}
-		fmt.Fprintf(os.Stderr, "Submission failed %s with: '%s'", resp.Status, string(msg))
-		os.Exit(EXIT_CONNECTION_FAILURE)
+		exitError(EXIT_CONNECTION_FAILURE, "Submission failed %s with: '%s'", resp.Status, string(msg))
 	}
 	fmt.Println("Successfully pushed new proof to server")
 }

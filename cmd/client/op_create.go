@@ -14,10 +14,8 @@ import (
 func requiredFlagsCreate(flags Flags) {
 	var opt FlagOpt
 	opt.Required(FlagNamePrivateKey, flags.PrivateKey != "")
-	opt.Required(FlagNameOutput, flags.Output != "")
-	opt.Required(FlagNameStore, flags.Store != "")
-	opt.Required(FlagNameExpire, flags.Expire != time.Duration(0))
-	opt.Optional(FlagNameMessage, flags.Message != "")
+	opt.Required(FlagNameManifest, flags.Manifest != "")
+	opt.Required(FlagNameProof, flags.Proof != "")
 	opt.Check()
 }
 
@@ -25,11 +23,10 @@ func operationCreate(flags Flags) {
 	// verify supplied flags
 	requiredFlagsCreate(flags)
 
-	// load latest proof from store
-	oldProof, err := fugl.LoadLatestProof(flags.Store)
+	// load manifest
+	manifest, err := ParseManifest(flags.Manifest)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to load latest proof: %s", err.Error())
-		os.Exit(EXIT_FILE_READ_ERROR)
+		exitError(EXIT_FILE_READ_ERROR, "Failed to load manifest %s", err.Error())
 	}
 
 	// load private key
@@ -60,39 +57,28 @@ func operationCreate(flags Flags) {
 		os.Exit(EXIT_FILE_READ_ERROR)
 	}
 
-	// load message (optional)
-	var message string
-	if flags.Message != "" {
-		tmp, err := ioutil.ReadFile(flags.Message)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Failed to read message: %s", err.Error())
-			os.Exit(EXIT_FILE_READ_ERROR)
-		}
-		message = string(tmp)
-	}
-
 	// create canary
+	now := time.Now()
+	expire := now.Add(time.Duration(manifest.Delta) * time.Second)
 	canary := fugl.Canary{
 		Version:  fugl.CanaryVersion,
-		Message:  message,
-		Previous: fugl.HashString(oldProof),
+		Author:   manifest.Author,
+		Creation: fugl.CanaryTime(now),
+		Deadline: fugl.CanaryTime(expire),
 		Nonce:    fugl.GetRandStr(fugl.CanaryNonceSize),
-		Deadline: fugl.CanaryTime(time.Now().Add(flags.Expire)),
 	}
 
 	// sign canary, producing proof
-	proof, err := fugl.SealProof(sk, canary)
+	proof, err := fugl.SealProof(sk, canary, manifest.Description)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to sign canary: %s", err.Error())
 		os.Exit(EXIT_FILE_READ_ERROR)
 	}
 
 	// write to output
-	err = ioutil.WriteFile(flags.Output, []byte(proof), 0644)
+	err = ioutil.WriteFile(flags.Proof, []byte(proof), 0644)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to write proof to file: %s", err.Error())
-		os.Exit(EXIT_FILE_READ_ERROR)
+		exitError(EXIT_FILE_WRITE_ERROR, "Failed to write proof to file: %s", err.Error())
 	}
-	fmt.Println("Wrote new proof to:", flags.Output)
-	fmt.Println("It is recommended that you add this to the local store")
+	fmt.Println("Saved new proof to:", flags.Proof)
 }

@@ -21,6 +21,25 @@ const (
 	ProofFileName       = "proof-%s-%s" + ProofFileExtension
 )
 
+func CheckCanaryFormat(canary *Canary, now time.Time) error {
+	if canary.Version != CanaryVersion {
+		return errors.New("Unsupported canary version")
+	}
+	if len(canary.Nonce) != CanaryNonceSize {
+		return errors.New(fmt.Sprintf("Nonce must be %d characters long", CanaryNonceSize))
+	}
+	if now.After(canary.Deadline.Time()) {
+		return errors.New("Deadline in the past (canary has expired)")
+	}
+	if canary.Author == "" {
+		return errors.New("Author field is empty")
+	}
+	if canary.Creation.Time().After(now) {
+		return errors.New("Creation time cannot be in the future (canary not valid yet)")
+	}
+	return nil
+}
+
 func LoadLatestProof(dir string) (string, error) {
 	// find newest proof
 	var proofFile string

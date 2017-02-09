@@ -40,7 +40,7 @@ func createState(config Config) *ServerState {
 
 	// parse latest proof
 	if state.latestProof != "" {
-		state.latestCanary, err = fugl.OpenProof(state.canaryKey, state.latestProof)
+		state.latestCanary, _, err = fugl.OpenProof(state.canaryKey, state.latestProof)
 		if err != nil {
 			logFatal("Failed to load latest canary:", err.Error())
 		}
@@ -59,10 +59,6 @@ func buildHandler(config Config) (http.Handler, *ServerState) {
 	if config.Server.EnableViewLatest {
 		logInfo("Enable view: Latest")
 		handler.Handle(fugl.SERVER_LATEST_PATH, &LatestHandler{state: state})
-	}
-	if config.Server.EnableViewStatus {
-		logInfo("Enable view: Status")
-		handler.Handle(fugl.SERVER_STATUS_PATH, &StatusHandler{state: state})
 	}
 	if config.Server.EnableViewGetKey {
 		logInfo("Enable view: GetKey")

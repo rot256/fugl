@@ -1,0 +1,24 @@
+delta = 864000 # 10 days in seconds
+author = "Test author"
+
+promises = [
+    "Not forced to handover logs to Europol",
+    "Have not faked the moon landing",
+    "We have not been raided by the FBI",
+    "Promises are optional"
+]
+
+description = """
+# This is a test description
+
+You can:
+
+* Explain the purpose of the canary
+* Maintain a human readable canary
+* Win peoples heart
+* Or just, Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
+
+The description should be valid markdown, to please your fellow humans.
+The machines should have no problem understanding it regardless
+(just avoid using the "Metadata" header)
+"""

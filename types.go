@@ -9,17 +9,12 @@ import (
 type CanaryTime time.Time
 
 type Canary struct {
-	Version  int64      `json:"version"`  // Struct version
-	Message  string     `json:"message"`  // Optional notification
-	Previous string     `json:"previous"` // Hash of previous canary
-	Deadline CanaryTime `json:"deadline"` // New deadline
+	Version  int64      `json:"version"`  // Canary struct version
+	Author   string     `json:"author"`   // Publishing entity of the canary
+	Creation CanaryTime `json:"creation"` // Time of creation
+	Deadline CanaryTime `json:"deadline"` // Next deadline
+	Promises []string   `json:"promises"` // Set of promises (may be empty)
 	Nonce    string     `json:"nonce"`    // Random nonce
-}
-
-type CanaryStatus struct {
-	Version int64  `json:"version"` // Current struct version
-	Enabled bool   `json:"enabled"` // Canaries enabled?
-	Key     string `json:"key"`     // Current PGP key
 }
 
 /* specifies the time format used in the canaries

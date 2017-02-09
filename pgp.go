@@ -2,7 +2,6 @@ package fugl
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"golang.org/x/crypto/openpgp"
 	"golang.org/x/crypto/openpgp/armor"
@@ -11,31 +10,6 @@ import (
 )
 
 /* Helper function for OpenPGP */
-
-func OpenProof(entity *openpgp.Entity, proof string) (*Canary, error) {
-	// check signature
-	block, err := PGPVerify(entity, []byte(proof))
-	if err != nil {
-		return nil, err
-	}
-
-	// load inner JSON structure
-	var canary Canary
-	err = json.Unmarshal(block.Bytes, &canary)
-	if err != nil {
-		return nil, errors.New("Unable to parse inner canary structure")
-	}
-	return &canary, nil
-}
-
-func SealProof(entity *openpgp.Entity, canary Canary) (string, error) {
-	// serialize and sign
-	inner, err := json.MarshalIndent(canary, "", "    ")
-	if err != nil {
-		return "", err
-	}
-	return PGPSign(entity, inner)
-}
 
 func PGPLoadPrivateKey(key []byte) (*openpgp.Entity, error) {
 	block, err := armor.Decode(bytes.NewReader([]byte(key)))
