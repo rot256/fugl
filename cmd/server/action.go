@@ -30,9 +30,9 @@ func actionRunner(command string, state *ServerState) {
 
 		// check time
 		now := time.Now()
-		deadline := state.latestCanary.Deadline.Time()
+		expiry := state.latestCanary.Expiry.Time()
 		state.canaryLock.RUnlock()
-		if now.After(deadline) {
+		if now.After(expiry) {
 			logInfo("Running failure action")
 			out, err := exec.Command(parts[0], parts[1:]...).Output()
 			if err != nil {
@@ -43,8 +43,8 @@ func actionRunner(command string, state *ServerState) {
 		}
 
 		// sleep
-		logDebug("Action Runner going to sleep:", deadline.Sub(now).Seconds())
-		time.Sleep(deadline.Sub(now))
+		logDebug("Action Runner going to sleep:", expiry.Sub(now).Seconds())
+		time.Sleep(expiry.Sub(now))
 		logDebug("Woke from sleep")
 	}
 }

@@ -77,8 +77,8 @@ func (h *SubmitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// verify deadline in future (avoid bricking)
-	if time.Now().After(canary.Deadline.Time()) {
+	// verify expires in the future
+	if time.Now().After(canary.Expiry.Time()) {
 		SendRequestError(w, "Canary must have a deadline in the future")
 		return
 	}
@@ -87,22 +87,15 @@ func (h *SubmitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.state.canaryLock.Lock()
 	defer h.state.canaryLock.Unlock()
 
-	// verify general fields
-	err = fugl.CheckCanaryFormat(canary, time.Now())
+	// verify canary fields
+	err = fugl.CheckCanary(canary, h.state.latestCanary, time.Now())
 	if err != nil {
 		SendRequestError(w, err.Error())
-	}
-
-	// verify deadline after previous deadline
-	if h.state.latestCanary != nil {
-		if !canary.Deadline.Time().After(h.state.latestCanary.Deadline.Time()) {
-			SendRequestError(w, "New canary deadline must be after previous deadline")
-			return
-		}
+		return
 	}
 
 	// save to disk
-	err = fugl.SaveToDirectory(proof, h.state.storeDir, canary.Deadline.Time())
+	err = fugl.SaveToDirectory(proof, h.state.storeDir, canary.Expiry.Time())
 	if err != nil {
 		logError("Failed to save valid proof to store:", err)
 		w.WriteHeader(http.StatusInternalServerError)

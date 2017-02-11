@@ -1,3 +1,4 @@
+final = false
 delta = 864000 # 10 days in seconds
 author = "Test author"
 
@@ -9,7 +10,7 @@ promises = [
 ]
 
 description = """
-# This is a test description
+# Test canary
 
 You can:
 

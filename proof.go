@@ -57,7 +57,7 @@ func SealProof(entity *openpgp.Entity, canary Canary, description string) (strin
 	if description == "" {
 		inner = fmt.Sprintf("%s\n%s", CANARY_SEPERATOR, string(ser))
 	} else {
-		inner = fmt.Sprintf("%s\n%s\n%s", description, CANARY_SEPERATOR, string(ser))
+		inner = fmt.Sprintf("%s\n%s\n\n%s", description, CANARY_SEPERATOR, string(ser))
 	}
 	return PGPSign(entity, []byte(inner))
 }

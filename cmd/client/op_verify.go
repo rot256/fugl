@@ -52,6 +52,6 @@ func operationVerify(flags Flags) {
 		exitError(EXIT_INVALID_CANARY, "Failed to validate canary fields: %s", err.Error())
 	}
 	fmt.Println("Author:", canary.Author)
-	fmt.Println("Deadline:", canary.Deadline.Time().Format(fugl.CanaryTimeFormat))
+	fmt.Println("Expires:", canary.Expiry.Time().Format(fugl.CanaryTimeFormat))
 	fmt.Println("Description:\n" + description)
 }

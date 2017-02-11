@@ -12,9 +12,10 @@ type Canary struct {
 	Version  int64      `json:"version"`  // Canary struct version
 	Author   string     `json:"author"`   // Publishing entity of the canary
 	Creation CanaryTime `json:"creation"` // Time of creation
-	Deadline CanaryTime `json:"deadline"` // Next deadline
+	Expiry   CanaryTime `json:"expiry"`   // Expiry time of canary
 	Promises []string   `json:"promises"` // Set of promises (may be empty)
 	Nonce    string     `json:"nonce"`    // Random nonce
+	Final    bool       `json:"final"`    // Is this canary final?
 }
 
 /* specifies the time format used in the canaries

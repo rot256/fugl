@@ -9,6 +9,7 @@ type Manifest struct {
 	Delta       int64    `toml:"delta"`       // time in seconds
 	Promises    []string `toml:"promises"`    // list of promises (for machines)
 	Description string   `toml:"description"` // content of human readable portion
+	Final       bool     `toml:"final"`       // canary is final
 }
 
 func ParseManifest(path string) (Manifest, error) {

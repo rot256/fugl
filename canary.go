@@ -21,6 +21,14 @@ const (
 	ProofFileName       = "proof-%s-%s" + ProofFileExtension
 )
 
+func CheckCanary(new *Canary, old *Canary, now time.Time) error {
+	err := CheckCanaryFormat(new, now)
+	if err != nil {
+		return err
+	}
+	return CheckCanaryPrevious(new, old)
+}
+
 func CheckCanaryFormat(canary *Canary, now time.Time) error {
 	if canary.Version != CanaryVersion {
 		return errors.New("Unsupported canary version")
@@ -28,14 +36,30 @@ func CheckCanaryFormat(canary *Canary, now time.Time) error {
 	if len(canary.Nonce) != CanaryNonceSize {
 		return errors.New(fmt.Sprintf("Nonce must be %d characters long", CanaryNonceSize))
 	}
-	if now.After(canary.Deadline.Time()) {
-		return errors.New("Deadline in the past (canary has expired)")
+	if now.After(canary.Expiry.Time()) {
+		return errors.New("Canary has expired")
 	}
 	if canary.Author == "" {
 		return errors.New("Author field is empty")
 	}
 	if canary.Creation.Time().After(now) {
 		return errors.New("Creation time cannot be in the future (canary not valid yet)")
+	}
+	return nil
+}
+
+func CheckCanaryPrevious(new *Canary, old *Canary) error {
+	if old == nil {
+		return nil
+	}
+	if old.Final {
+		return errors.New("Current canary is final")
+	}
+	if old.Creation.Time().After(new.Creation.Time()) {
+		return errors.New("Current canary has creation after new")
+	}
+	if !new.Expiry.Time().After(old.Expiry.Time()) {
+		return errors.New("New canary does not have expiry time after old")
 	}
 	return nil
 }

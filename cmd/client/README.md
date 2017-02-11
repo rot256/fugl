@@ -12,39 +12,46 @@ Furthermore you should create a directory for storing the proof chain (default i
 
 ## Creating
 
-You can create new proofs using the create operation,
-the `previous` field will be populated using the newest proof in the store (unless the store is empty).
+You can create new proofs using the create operation.
+Before doing so you must create a canary "manifest", which is a template for creating new canaries.
+An example of such a manifest can be found in the current directory (see manifest.toml).
 
-Here an example of creating a proof, with an expiry date 100 days (2400 hours) into the future:
+After editing the manifest, a new proof can be created like this:
 
 ```
-~> ./client --operation=create --private-key=./private.pgp --expire=2400h
+~> ./client --operation=create --private-key=./private.pgp
 Private key encrypted, please enter passphrase:
 Wrote new proof to: temp.proof
-It is recommended that you add this to the local store
 ```
 
-## Adding
+## Verifying
 
-When you have created (or pulled) a new proof you may want to add this to the store,
-which is the directory storing the state of the proof chain.
-This is used both when following chains from other people and after creating a new proof.
+For verifying the validity of proofs, you must use the "verify" operation.
+It verifies the PGP signature as well as fields of the canary in the metadata section.
 
-An example of using the "add" operation:
+An example follows (using the newly created proof):
 
 ```
-~> ./client --operation=add --input=./temp.proof --public-key=./public.pgp
-New deadline: 2017-05-16T22:40:21+02:00
-```
+~> ./client --operation=verify --public-key=./public.pgp
+Author: Test author
+Expires: 2017-02-21T11:27:54+01:00
+Description:
+# Test canary
 
-Of course this also validates the signature and previous field.
+You can:
+
+* Explain the purpose of the canary
+* Maintain a human readable canary
+...
+```
 
 ## Pushing
 
 Proofs are added to the server by pushing.
-Pushing is really a fancy word for issuing a post request, after which the server will validate the proof (in completely the same way as the "add" operation).
+Pushing is really a fancy word for issuing a POST request, after which the server will validate the proof
+(in the same way as the "verify" operation on the client).
 
-A silly example of using the "push" operation, using a server on localhost:
+A silly example using a server on localhost follows (using the default value for the "proof" parameter):
 
 ```
 ~> ./client --operation=push --address=http://127.0.0.1:8080/submit
@@ -53,11 +60,10 @@ Successfully pushed new proof to server
 
 ## Pulling
 
-This is essentially just a HTTP get request and can also be carried out using wget, curl or your favourite browser.
-The client "pulls" the newest proof from the server into a temporary file (output),
-which you can then validate and add to the store using "add" (see next section).
+The client "pulls" the newest proof from the server into a temporary file using a GET request.
+You then use the verify operation to verify its validity.
 
-A silly example of using the "pull" operation, using a server on localhost:
+Here an example of using the "pull" operation:
 
 ```
 ~> ./client --operation=pull --address=http://127.0.0.1:8080/latest

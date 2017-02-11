@@ -64,8 +64,9 @@ func operationCreate(flags Flags) {
 		Version:  fugl.CanaryVersion,
 		Author:   manifest.Author,
 		Creation: fugl.CanaryTime(now),
-		Deadline: fugl.CanaryTime(expire),
+		Expiry:   fugl.CanaryTime(expire),
 		Nonce:    fugl.GetRandStr(fugl.CanaryNonceSize),
+		Final:    manifest.Final,
 	}
 
 	// sign canary, producing proof
@@ -81,4 +82,7 @@ func operationCreate(flags Flags) {
 		exitError(EXIT_FILE_WRITE_ERROR, "Failed to write proof to file: %s", err.Error())
 	}
 	fmt.Println("Saved new proof to:", flags.Proof)
+	if manifest.Final {
+		fmt.Println("WARNING: This canary is final!")
+	}
 }
