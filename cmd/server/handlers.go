@@ -64,10 +64,20 @@ type SubmitHandler struct {
 func (h *SubmitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// parse and verify signature
 	proof := r.PostFormValue(fugl.SERVER_SUBMIT_FIELD_NAME)
+	if proof == "" {
+		SendRequestError(w, "No proof form attribute specified")
+		return
+	}
 	logDebug("New proof submission:\n", proof)
+
 	canary, _, err := fugl.OpenProof(h.state.canaryKey, proof)
 	if err != nil {
 		SendRequestError(w, err.Error())
+		return
+	}
+	if canary == nil {
+		SendRequestError(w, "Unable to load canary from proof")
+		return
 	}
 
 	// check version field
