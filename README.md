@@ -108,7 +108,7 @@ The server is included to simplify automation.
 
 ## Getting started
 
-You can start using Fugl, by setting up a go environment and running `make` in the root.
+You can start using Fugl, by setting up a [go environment](https://golang.org/doc/install) and running `make` in the `cmd/client` and `cmd/server` directories.
 
 If there is interest I will provide pre-compiled binaries (but given the setting I would advise against it).
 
