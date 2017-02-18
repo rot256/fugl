@@ -57,6 +57,9 @@ func PGPVerify(entity *openpgp.Entity, signature []byte) (*clearsign.Block, erro
 	if len(rest) > 0 {
 		return nil, errors.New("Proof contains junk")
 	}
+	if block == nil {
+		return nil, errors.New("Unable to read pgp block")
+	}
 
 	// verify signature
 	keyring := make(openpgp.EntityList, 1)
