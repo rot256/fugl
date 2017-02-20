@@ -65,6 +65,7 @@ func (opt *FlagOpt) Optional(name string, isEnabled bool) {
 
 func exitError(code int, format string, args ...interface{}) {
 	fmt.Fprintf(os.Stderr, format, args...)
+	fmt.Fprintf(os.Stderr, "\n")
 	os.Exit(code)
 }
 

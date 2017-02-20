@@ -1,6 +1,6 @@
 BIN=fugl-server
 
-$(BIN):
+$(BIN): *.go
 	go get
 	go build -o $(BIN)
 

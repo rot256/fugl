@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/rot256/fugl"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -18,6 +19,12 @@ func requiredFlagsPull(flags Flags) {
 func operationPull(flags Flags) {
 	requiredFlagsPull(flags)
 
+	// create final url
+	addr, err := createURL(flags.Address, fugl.SERVER_LATEST_PATH)
+	if err != nil {
+		exitError(EXIT_INVALID_ADDRESS, "Failed to parse address %s", err.Error())
+	}
+
 	// create (proxied) client
 	client, err := CreateHttpClient(flags.Proxy)
 	if err != nil {
@@ -26,7 +33,7 @@ func operationPull(flags Flags) {
 	}
 
 	// do http request
-	resp, err := client.Get(flags.Address)
+	resp, err := client.Get(addr)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed connect to address: %s", err.Error())
 		os.Exit(EXIT_CONNECTION_FAILURE)
