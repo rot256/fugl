@@ -1,5 +1,7 @@
 *.pgp
 *.proof
 *.sig
+*.pem
 *.txt
-*
+cmd/client/fugl-client
+cmd/server/fugl-server
