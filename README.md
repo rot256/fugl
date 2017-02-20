@@ -19,7 +19,7 @@ Unlike exiting canaries this allows for:
 
 - Automatic creation and submission of new canaries
 - Automatic validation of canaries from hundreds of different organizations
-- The creation of central services verifying canaries and notifying subscribed uses.
+- The creation of central services which verify canaries and notifies subscribed users
 
 ## The format
 
@@ -74,7 +74,7 @@ RcVToAwQi3FgOhrwZfsJhbFZQ3jUZqUSDrSnGOpbXTjXelVzrCmigBjB41MN8U6/
 The following fields are found in the current version:
 
 Name     | Description
----------| ------------------------------------------------------------------------------
+---------|-------------------------------------------------------------------------------
 Version  | Canary structure version
 Author   | The purported author of the proof
 Creation | Time of creation for the canary
@@ -100,11 +100,11 @@ All proofs are verified upon submission (using a specified public key) and saved
 The server serves the proofs and the public key, allowing a client to start tracking the proofs.
 
 In addition the Fugl canary server can be used as digital [Dead man's switch](https://en.wikipedia.org/wiki/Dead_man's_switch),
-by specifying an action (system command) which should be executed by the server if a canary has not been submitted before the next deadline.
+by specifying an action (system command) which should be executed by the server if a canary has not been submitted before the expiry time.
 
 Fugl was explicitly designed so that it does not rely on a single model of distribution.
 If you want to save and store the proofs on e.g. an FTP server this is also possible -- as long as clients know how to retrieve the proofs.
-The server is included to simplify automation.
+The server is included to simplify distribution and automation.
 
 ## Getting started
 
