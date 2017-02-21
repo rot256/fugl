@@ -1,28 +1,28 @@
 package main
 
 import (
+	"fmt"
 	"net/url"
+	"path"
+	"strings"
 )
 
-func createURL(address string, path string) (string, error) {
+const (
+	DefaultProtocol = "https"
+)
+
+func createURL(address string, p string) (string, error) {
+	// If we're missing the uri scheme, prepend it
+	if !strings.HasPrefix(address, "http") {
+		address = fmt.Sprintf("%s://%s", DefaultProtocol, address)
+	}
+
 	url, err := url.Parse(address)
 	if err != nil {
 		return "", err
 	}
 
-	// behaves strange if omitted
-	// create a ticket if you disagree
-	if url.Host == "" {
-		url.Host = url.Path
-		url.Path = ""
-	}
+	url.Path = path.Join(url.Path, p)
 
-	// set default scheme and path
-	if url.Path == "" {
-		url.Path = path
-	}
-	if url.Scheme == "" {
-		url.Scheme = "https"
-	}
 	return url.String(), nil
 }
