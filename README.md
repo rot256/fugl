@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/rot256/fugl.svg?branch=master)](https://travis-ci.org/rot256/fugl)
+
 # Fugl
 
 Fugl ("bird" in Danish) is a [warrant canary](https://en.wikipedia.org/wiki/Warrant_canary) solution/system.

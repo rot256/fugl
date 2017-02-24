@@ -3,6 +3,7 @@ package fugl
 import (
 	"errors"
 	"fmt"
+	"reflect"
 	"time"
 )
 
@@ -18,11 +19,21 @@ type Canary struct {
 	Final    bool       `json:"final"`    // Is this canary final?
 }
 
+func (c Canary) Equal(other Canary) bool {
+	return (c.Version == other.Version) &&
+		(c.Author == other.Author) &&
+		c.Creation.Time().Equal(other.Creation.Time()) &&
+		c.Expiry.Time().Equal(other.Expiry.Time()) &&
+		reflect.DeepEqual(c.Promises, other.Promises) &&
+		(c.Nonce == other.Nonce) &&
+		(c.Final == other.Final)
+}
+
 /* specifies the time format used in the canaries
  */
 
 func (t CanaryTime) MarshalJSON() ([]byte, error) {
-	stamp := fmt.Sprintf("\"%s\"", time.Time(t).Format(CanaryTimeFormat))
+	stamp := fmt.Sprintf("\"%s\"", t.String())
 	return []byte(stamp), nil
 }
 
@@ -43,5 +54,9 @@ func (t *CanaryTime) UnmarshalJSON(val []byte) error {
 }
 
 func (t CanaryTime) Time() time.Time {
-	return time.Time(t)
+	return time.Time(t).Round(1 * time.Second)
+}
+
+func (t CanaryTime) String() string {
+	return t.Time().Format(CanaryTimeFormat)
 }

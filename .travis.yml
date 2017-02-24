@@ -1,0 +1,13 @@
+language: go
+
+go:
+  - 1.7.5
+  - tip
+
+install:
+  - go get -t ./...
+
+script:
+  - go test -v ./...
+  - make -C cmd/client
+  - make -C cmd/server
