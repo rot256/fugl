@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/rot256/fugl.svg?branch=master)](https://travis-ci.org/rot256/fugl.svg)
+[![Build Status](https://travis-ci.org/rot256/fugl.svg?branch=master)](https://travis-ci.org/rot256/fugl)
 
 # Fugl
 
