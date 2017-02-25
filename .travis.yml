@@ -1,8 +1,12 @@
 language: go
 
 go:
-  - 1.7.5
   - tip
+  - 1.8
+  - 1.7
+  - 1.6
+  - 1.5
+  - 1.4
 
 install:
   - go get -t ./...
