@@ -17,7 +17,7 @@ The goal is to provide canaries which are:
 - Easy to parse for machines
 - Simple to update and validate systematically
 
-Unlike exiting canaries this allows for:
+Unlike existing canaries this allows for:
 
 - Automatic creation and submission of new canaries
 - Automatic validation of canaries from hundreds of different organizations
@@ -106,7 +106,7 @@ by specifying an action (system command) which should be executed by the server 
 
 Fugl was explicitly designed so that it does not rely on a single model of distribution.
 If you want to save and store the proofs on e.g. an FTP server this is also possible -- as long as clients know how to retrieve the proofs.
-The server is included to simplify distribution and automation.
+The server is included to simplify distribution and automation, the client is the essential part of Fugl.
 
 ## Getting started
 
@@ -121,7 +121,7 @@ If there is interest I will provide pre-compiled binaries (but given the setting
 
 ## Contributing
 
-Fugl is still a work in progress (but close to being production ready),
+Fugl is still a work in progress,
 if you want to contribute the best way to do so is by:
 
 - Read the code (it is short and quite readable)
@@ -131,4 +131,4 @@ Simplicity is prioritized over new features!
 
 This repo WILL NOT contain an automatic system for tracking the canaries,
 such a system should be easy to implement using the client (and I encourage people to do so).
-Alternatively this repository can be used as a go library.
+Alternatively this repository can be used as a library.
