@@ -9,6 +9,9 @@ promises = [
     "Promises are optional"
 ]
 
+news = [
+]
+
 description = """
 # Test canary
 

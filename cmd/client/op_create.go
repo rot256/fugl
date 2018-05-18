@@ -3,12 +3,16 @@ package main
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"regexp"
+	"strings"
+	"time"
+
 	"github.com/rot256/fugl"
 	"golang.org/x/crypto/openpgp"
 	"golang.org/x/crypto/ssh/terminal"
-	"io/ioutil"
-	"os"
-	"time"
 )
 
 func requiredFlagsCreate(flags Flags) {
@@ -57,6 +61,29 @@ func operationCreate(flags Flags) {
 		os.Exit(EXIT_FILE_READ_ERROR)
 	}
 
+	var regexTitle = regexp.MustCompile(`(?m)<title><!\[CDATA\[(.*?)\]\]><\/title>`)
+
+	response, err := http.Get("http://feeds.bbci.co.uk/news/world/rss.xml")
+	if err != nil {
+		exitError(EXIT_NEWS_RETRIEVE_ERROR, "Error retrieving BBC news articles: %s", err.Error())
+	}
+
+	defer response.Body.Close()
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		exitError(EXIT_NEWS_READ_ERROR, "Error reading BBC news articles: %s", err.Error())
+	}
+
+	matches := regexTitle.FindAllStringSubmatch(string(body), -1)
+
+	for _, v := range matches {
+		if strings.ToLower(v[1]) == "bbc news - world" {
+			continue
+		}
+
+		manifest.News = append(manifest.News, v[1])
+	}
+
 	// create canary
 	now := time.Now()
 	expire := now.Add(time.Duration(manifest.Delta) * time.Second)
@@ -67,6 +94,7 @@ func operationCreate(flags Flags) {
 		Expiry:   fugl.CanaryTime(expire),
 		Nonce:    fugl.GetRandStr(fugl.CanaryNonceSize),
 		Final:    manifest.Final,
+		News:     manifest.News,
 	}
 
 	// sign canary, producing proof
