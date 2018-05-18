@@ -17,6 +17,7 @@ type Canary struct {
 	Promises []string   `json:"promises"` // Set of promises (may be empty)
 	Nonce    string     `json:"nonce"`    // Random nonce
 	Final    bool       `json:"final"`    // Is this canary final?
+	News     []string   `json:"news"`     // list of BBC news articles
 }
 
 func (c Canary) Equal(other Canary) bool {
